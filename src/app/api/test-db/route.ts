@@ -7,6 +7,10 @@ export async function GET() {
         const result = await db.select().from(users);
         return NextResponse.json(result);
     } catch (e) {
-        return NextResponse.json({ error: 'Error ao buscar usuários', e });
-    };
+        console.error(e);
+    
+        return NextResponse.json({
+            error: "Error ao buscar usuários"
+        }, { status: 500 });
+    }
 };
