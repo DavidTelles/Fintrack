@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import "../../globals.css";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     async function login(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -42,7 +43,8 @@ export default function Login() {
                 return;
             }
 
-            alert("Login successful");
+            router.push('/dashboard');
+            router.refresh();
         } catch (error) {
             console.error(error);
             alert("Internal server error");

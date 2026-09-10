@@ -1,8 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+    const router = useRouter();
+
+    async function handleLogout() {
+        try {
+            await fetch("/api/auth/logout", {
+                method: "POST",
+            });
+
+            router.push("/login");
+            router.refresh();
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    }
+
     return (
         <main className="min-h-screen min-w-screen bg-zinc-950 text-white">
             <nav className="flex items-center justify-between border-b border-zinc-800 px-8 py-5">
@@ -22,7 +38,8 @@ export default function Dashboard() {
                     </Link>
 
                     <button
-                        className="text-sm text-zinc-400 transition hover:text-white"
+                        onClick={handleLogout}
+                        className="text-sm text-zinc-400 transition hover:text-white hover:cursor-pointer"
                     >
                         Logout
                     </button>
