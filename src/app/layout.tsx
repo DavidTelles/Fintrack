@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Topbar from "./components/Topbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -11,7 +10,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
       <body className="flex">
-        <Topbar />
         {children}
       </body>
     </html>

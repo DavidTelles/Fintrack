@@ -1,6 +1,6 @@
 import { db } from "@/src/db/index";
 import { users } from "@/src/db/schema";
-import { CreateUserSchema } from "@/src/schemas/user.schema";
+import { CreateUserSchema } from "@/src/schemas/users.schema";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt"
 
