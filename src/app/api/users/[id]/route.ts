@@ -2,13 +2,15 @@ import { db } from "@/src/db/index";
 import { users } from "@/src/db/schema";
 import { CreateUserSchema } from "@/src/schemas/users.schema";
 import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+import { getAuthenticatedUser } from "@/src/lib/auth";
 import bcrypt from "bcrypt";
 
 export async function GET(
-    request: Request,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const user = await getAuthenticatedUser(request);
     const { id } = await params;
     const numericId = parseInt(id, 10);
 
@@ -16,6 +18,13 @@ export async function GET(
         return NextResponse.json({ message: 'Id need to be a number' }, { status: 400 });
     }
 
+    if (!user) {
+        return NextResponse.json({ message: "You need to be authenticated" }, { status: 401 })
+    }
+
+    if (user.role !== "admin" && user.userId !== numericId) {
+        return NextResponse.json({ message: "You don't have permission to do this" }, { status: 403 })
+    }
 
     try {
         const result = await db.select({
@@ -36,17 +45,23 @@ export async function GET(
 };
 
 export async function PATCH(
-    request: Request,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const user = await getAuthenticatedUser(request);
     const { id } = await params;
     const numericId = parseInt(id, 10);
 
     if (Number.isNaN(numericId)) {
-        return NextResponse.json(
-            { message: "Id needs to be a number" },
-            { status: 400 }
-        );
+        return NextResponse.json({ message: "Id needs to be a number" }, { status: 400 });
+    }
+
+    if (!user) {
+        return NextResponse.json({ message: "You need to be authenticated" }, { status: 401 })
+    }
+
+    if (user.role !== "admin" && user.userId !== numericId) {
+        return NextResponse.json({ message: "You don't have permission to do this" }, { status: 403 })
     }
 
     try {
@@ -90,11 +105,11 @@ export async function PATCH(
         }
 
         const result = await db.update(users).set(updateData).where(eq(users.id, numericId)).returning({
-                id: users.id,
-                name: users.name,
-                email: users.email,
-                createdAt: users.createdAt
-            });
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            createdAt: users.createdAt
+        });
 
         if (result.length === 0) {
             return NextResponse.json(
@@ -120,14 +135,23 @@ export async function PATCH(
 };
 
 export async function DELETE(
-    request: Request,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const user = await getAuthenticatedUser(request);
     const { id } = await params;
     const numericId = parseInt(id, 10);
 
     if (Number.isNaN(numericId)) {
         return NextResponse.json({ message: 'Id need to be a number' }, { status: 400 });
+    }
+
+    if (!user) {
+        return NextResponse.json({ message: "You need to be authenticated" }, { status: 401 })
+    }
+
+    if (user.role !== "admin" && user.userId !== numericId) {
+        return NextResponse.json({ message: "You don't have permission to do this" }, { status: 403 })
     }
 
     try {

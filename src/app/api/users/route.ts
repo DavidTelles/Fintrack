@@ -26,8 +26,8 @@ export async function POST(request: NextRequest) {
         if (authSchema.success) {
             const passwordHash = await bcrypt.hash(body.password, 10)
             const result = await db.insert(users).values({
-                name: body.name,
-                email: body.email,
+                name: authSchema.data.name,
+                email: authSchema.data.email,
                 password: passwordHash
             });
             return NextResponse.json(result, { status: 201 })
@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Email already exists' }, { status: 409 });
         }
 
+        console.error(e)
         return NextResponse.json({ error: 'Error add users', e });
     }
 }

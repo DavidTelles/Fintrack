@@ -5,5 +5,6 @@ export const users = pgTable("users", {
     name: text().notNull(),
     email: text().notNull().unique(),
     password: text().notNull(),
+    role: text().notNull().default("user"),
     createdAt: timestamp().defaultNow()
 })
